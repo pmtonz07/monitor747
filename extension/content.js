@@ -173,38 +173,42 @@ function menuChatUnread() {
   }
   if (!label) return null;
 
-  let row = label;
   let parent = label.parentElement;
   for (let i = 0; i < 6 && parent; i++) {
-    row = parent;
     const kids = Array.from(parent.children);
     const labelIdx = kids.indexOf(label);
-    const hits = [];
-    for (const c of row.querySelectorAll('*')) {
+    const cands = [];
+    for (const c of parent.querySelectorAll('*')) {
       if (c.children.length) continue;
       const v = parseValue(c.textContent);
       if (v === null) continue;
-      if (!isBadgeText(c)) continue;
-      hits.push(c);
+      if (!isVisible(c)) continue;
+      const fs = parseFloat(window.getComputedStyle(c).fontSize) || 0;
+      // ระดับแคบรอบป้าย → ตัวเลขที่เห็นถือเป็น badge ได้เลย (ไม่มีเลขอื่นปนในแถว)
+      // ระดับไกลขึ้น → ต้องผ่าน badgeish/isBadgeText
+      const pass = i <= 1 ? fs >= 8 && fs <= 18 : isBadgeText(c);
+      if (pass) cands.push({ c, v });
     }
-    if (hits.length) {
+    if (cands.length) {
       if (labelIdx >= 0) {
-        // เลือกตัวที่ใกล้ป้ายที่สุดในตำแหน่ง DOM
-        const idxs = hits.map((c) => {
-          const ci = row.children.length
-            ? Array.from(row.children).findIndex((x) => x.contains(c) || x === c)
+        const ranked = cands.map(({ c, v }) => {
+          const ci = parent.children.length
+            ? Array.from(parent.children).findIndex((x) => x.contains(c) || x === c)
             : -1;
-          return { c, d: ci < 0 ? 999 : Math.abs(ci - labelIdx), ci };
+          return { v, d: ci < 0 ? 999 : Math.abs(ci - labelIdx) };
         });
-        idxs.sort((a, b) => a.d - b.d);
-        return parseValue(idxs[0].c.textContent);
+        ranked.sort((a, b) => a.d - b.d);
+        return ranked[0].v;
       }
-      return parseValue(hits[0].textContent);
+      return cands[0].v;
+    }
+    if (/^\s*\d+\s*\+?\s*$/.test(parent.textContent)) {
+      return parseValue(parent.textContent);
     }
     label = parent;
     parent = parent.parentElement;
   }
-  return 0; // หาเมนูเจอ แต่ badge ว่าง = ไม่มีแชทค้าง
+  return 0; // มีเมนู แต่ไม่เห็นตัวเลข = ไม่มีแชทค้าง
 }
 
 function collectNumericCandidates() {
