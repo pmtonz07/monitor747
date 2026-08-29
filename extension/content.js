@@ -24,6 +24,48 @@ const UNREAD_SELECTORS = [
   '[class*="msg-num" i]',
 ];
 
+// --- debug: เรียกจาก console ว่า __m747dbg() ---
+window.__m747dbg = () => {
+  const out = { path: location.pathname };
+  const leafs = document.querySelectorAll('*');
+  const labels = [];
+  for (const el of leafs) {
+    if (el.children.length) continue;
+    const t = (el.textContent || '').trim();
+    if (t === 'แชท' || t === 'Chat') labels.push(el);
+  }
+  out.menuLabels = labels.length;
+  if (labels.length) {
+    let row = labels[0];
+    out.levelHits = [];
+    for (let i = 0; i < 6 && row; i++) {
+      row = row.parentElement;
+      if (!row) continue;
+      const hits = [];
+      for (const c of row.querySelectorAll('*')) {
+        if (c.children.length) continue;
+        const v = parseValue(c.textContent);
+        if (v === null) continue;
+        hits.push({ v, cls: (c.className || '').toString().slice(0, 40), fs: window.getComputedStyle(c).fontSize, bg: window.getComputedStyle(c).backgroundColor, color: window.getComputedStyle(c).color });
+      }
+      if (hits.length) out.levelHits.push({ level: i + 1, hits });
+    }
+  }
+  const allNum = [];
+  for (const el of leafs) {
+    if (el.children.length) continue;
+    const v = parseValue(el.textContent);
+    if (v === null) continue;
+    if (!isVisible(el)) continue;
+    const st = window.getComputedStyle(el);
+    const b = badgeish(el, st) ? 1 : 0;
+    allNum.push({ v, b, fs: st.fontSize, bg: st.backgroundColor, text: (el.textContent || '').trim().slice(0, 12) });
+  }
+  out.redDigits = allNum.filter((x) => x.b);
+  out.sample = allNum.slice(0, 40);
+  console.log('[MONITOR747-DEBUG]', JSON.stringify(out));
+};
+
 try {
   chrome.storage.sync.get('m747Bridge', (res) => {
     if (res && res.m747Bridge) BRIDGE_URL = String(res.m747Bridge).replace(/\/$/, '');
