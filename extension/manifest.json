@@ -4,7 +4,8 @@
   "version": "1.1.0",
   "description": "ส่งตัวเลขแชทค้างจาก chat.line.biz ไปยัง dashboard MONITOR 747 แบบเรียลไทม์",
   "permissions": ["storage"],
-  "host_permissions": ["https://chat.line.biz/*", "http://localhost:3000/*"],
+  "host_permissions": ["https://chat.line.biz/*", "http://localhost:3000/*", "https://monitor747.onrender.com/*"],
+  "action": { "default_popup": "popup.html", "default_title": "MONITOR 747 Bridge" },
   "content_scripts": [
     {
       "matches": ["https://chat.line.biz/*"],
