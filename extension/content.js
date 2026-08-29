@@ -144,11 +144,12 @@ function collectNumericCandidates() {
 }
 
 function sendUpdate() {
+  const id = accountIdFromUrl();
+  if (!id) return; // หน้าเพจยังไม่โหลด route ครบ (SPA) — เงียบๆ สแกนต่อไป
   const account = currentAccount();
   if (!account.configured || !account.name) {
-    const id = accountIdFromUrl();
     console.warn(
-      '[MONITOR747] skip (no config for accountId ' + (id || '(none)') + ')',
+      '[MONITOR747] skip (no config for accountId ' + id + ')',
       '- add it via dashboard /admin'
     );
     fetchConfig(); // ดึง config ใหม่ทันที เผื่อเพิ่งเพิ่มทาง admin
