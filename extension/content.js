@@ -233,6 +233,11 @@ observer.observe(document.body, {
 
 setInterval(() => {
   scanNow(true);
-}, 60000);
+}, 20000);
+
+// กลับมาเปิดแท็บเมื่อไหร่ → ส่งค่าทันที กัน board ค้าง
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) scanNow(true);
+});
 
 console.log('[MONITOR747] bridge active on', location.href, '| backend:', BRIDGE_URL);
