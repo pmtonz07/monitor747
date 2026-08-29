@@ -8,5 +8,4 @@ services:
     startCommand: node server.js
     envVars:
       - key: ADMIN_KEY
-        value: 747admin
         sync: false
