@@ -82,12 +82,17 @@ function parseColor(str) {
   return { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] };
 }
 
-// badge จริง = มีพื้นหลังสี หรือ ตัวอักษรออกแดง (LINE ใช้ badge แดง)
+function isRed(p) {
+  if (!p || p.a < 0.06) return false;
+  return p.r >= 160 && (p.r - p.g) >= 60 && (p.r - p.b) >= 60;
+}
+
+// badge จริงของ LINE = ป้ายแดงเล็กๆ เท่านั้น จับเฉพาะ red เพื่อไม่เก็บตัวเลขสีอื่นมั่ว
 function badgeish(el, style) {
-  const bg = parseColor(style.backgroundColor);
-  if (bg && bg.a > 0.05) return true;
-  const c = parseColor(style.color);
-  if (c && c.r > 150 && c.r > c.g * 1.25 && c.r > c.b * 1.25) return true;
+  const r = el.getBoundingClientRect();
+  if (!r.width || r.height > 22 || r.width > 110) return false; // badge ต้องเล็ก
+  if (isRed(parseColor(style.backgroundColor))) return true;
+  if (isRed(parseColor(style.color))) return true;
   return false;
 }
 
