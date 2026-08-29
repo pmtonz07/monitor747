@@ -122,15 +122,19 @@
       <div class="msg" id="formMsg"></div>
     </div>
 
-    <div class="card">
-      <h2>รายการบัญชีปัจจุบัน</h2>
-      <table>
-        <thead>
-          <tr><th>ชื่อไลน์</th><th>Account ID</th><th>บริษัท</th><th>Tier</th><th style="text-align:right">แชทค้าง</th><th></th></tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
+<div class="card">
+        <h2>รายการบัญชีปัจจุบัน</h2>
+        <table>
+          <thead>
+            <tr><th>ชื่อไลน์</th><th>Account ID</th><th>บริษัท</th><th>Tier</th><th style="text-align:right">แชทค้าง</th><th></th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <span class="hint" style="margin:0">ยอดค้างที่อ่านได้จากแท็บ — กดล้างเมื่ออยากเริ่มใหม่</span>
+          <button class="btn danger" id="btnReset">ล้างตัวเลขทั้งหมด (เป็น 0)</button>
+        </div>
+      </div>
 
     <div class="card">
       <h2>วิธีเชื่อมต่อจากเครื่องอื่น</h2>
@@ -180,6 +184,19 @@
       } else {
         const m = $('#loginMsg');
         m.textContent = 'รหัสไม่ถูกต้อง';
+        m.className = 'msg err';
+      }
+    });
+
+    $('#btnReset').addEventListener('click', async () => {
+      if (!confirm('ล้างตัวเลขแชทค้างทั้งหมดเป็น 0 หลังแท็บไลน์ส่งค่าจริงแล้วจะแทนเอง ยืนยัน?')) return;
+      const { ok, j } = await api('/api/admin/reset', { method: 'POST', body: '{}' });
+      const m = $('#formMsg');
+      if (ok) {
+        m.textContent = 'ล้างแล้ว ' + (j.cleared || 0) + ' บัญชี';
+        m.className = 'msg ok';
+      } else {
+        m.textContent = j.error || 'ล้างไม่สำเร็จ';
         m.className = 'msg err';
       }
     });

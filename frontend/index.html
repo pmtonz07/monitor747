@@ -638,8 +638,13 @@ const SRC_LABELS = { bridge: 'บริดจ์', sim: 'สตรีมจำ�
     function updateNotes(accounts) {
       const companies = new Set();
       accounts.forEach((a) => companies.add(a.company));
+      const last = accounts.reduce((m, a) => Math.max(m, a.updatedAt || 0), 0);
+      const t = new Date(last);
+      const time = last
+        ? [t.getHours(), t.getMinutes(), t.getSeconds()].map((n) => String(n).padStart(2, '0')).join(':')
+        : '--:--:--';
       $('#totalNotes').textContent =
-        `แชทค้างรอตอบ · ${accounts.length} บัญชี · ${companies.size} บริษัท`;
+        `แชทค้างรอตอบ · ${accounts.length} บัญชี · ${companies.size} บริษัท · สดล่าสุด ${time}`;
     }
 
     /* hero: tier summary */

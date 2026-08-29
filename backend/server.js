@@ -209,6 +209,16 @@ app.delete('/api/admin/remove/:name', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/admin/reset', requireAdmin, (req, res) => {
+  for (const a of accounts) {
+    a.unread = 0;
+    a.source = 'seed';
+    a.updatedAt = Date.now();
+  }
+  broadcast();
+  res.json({ ok: true, cleared: accounts.length });
+});
+
 let sim = null;
 app.post('/api/sim/toggle', (req, res) => {
   if (sim) {
