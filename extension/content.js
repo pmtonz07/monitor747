@@ -188,7 +188,7 @@ function sendUpdate() {
     });
 }
 
-function scanNow() {
+function scanNow(force) {
   const values = collectNumericCandidates();
   currentTotal = values.reduce((s, v) => s + v, 0);
   lastValues = values;
@@ -197,6 +197,8 @@ function scanNow() {
   if (currentTotal === pendingValue) {
     if (lastTotal === null || currentTotal !== lastTotal) {
       sendUpdate();
+    } else if (force) {
+      sendUpdate(); // heartbeat: ส่งซ้ำค่าคงที่ ให้ board สดเสมอ
     }
     lastTotal = currentTotal;
   }
@@ -230,7 +232,7 @@ observer.observe(document.body, {
 });
 
 setInterval(() => {
-  scanNow();
-}, 20000);
+  scanNow(true);
+}, 60000);
 
 console.log('[MONITOR747] bridge active on', location.href, '| backend:', BRIDGE_URL);
