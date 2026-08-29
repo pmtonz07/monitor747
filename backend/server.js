@@ -233,6 +233,10 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+app.get('/admin', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'admin.html'));
+});
 
 io.on('connection', (socket) => {
   socket.emit('init', snapshot());
