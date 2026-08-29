@@ -11,6 +11,7 @@ let lastValues = [];
 let currentTotal = 0;
 let scanTimer = null;
 let pendingValue = null;
+let sourceMode = 'bridge';
 
 // selector ที่เข้ากันได้กับ badge ฝั่ง chat.line.biz ทุกรูปแบบที่พอจะเดาได้
 const UNREAD_SELECTORS = [
@@ -101,6 +102,35 @@ function parseValue(txt) {
   return m ? parseInt(m[1], 10) : null;
 }
 
+// ตัวเลขจากเมนู "แชท" (ป้ายซ้ายมือ) — ตัวเดียวที่อยากได้
+// ถ้าหาไม่เจอ (หน้าไม่ใช่หน้าหลัก) คืน null → ใช้วิธีรวมย่อยแทน
+function menuChatUnread() {
+  const leafs = document.querySelectorAll('*');
+  let label = null;
+  for (const el of leafs) {
+    if (el.children.length) continue;
+    const t = (el.textContent || '').trim();
+    if (t === 'แชท' || t === 'Chat') { label = el; break; }
+  }
+  if (!label) return null;
+  let row = label;
+  for (let i = 0; i < 6 && row; i++) {
+    row = row.parentElement;
+    if (!row) continue;
+    const cands = row.querySelectorAll('*');
+    for (const c of cands) {
+      if (c.children.length) continue;
+      const v = parseValue(c.textContent);
+      if (v === null) continue;
+      const st = window.getComputedStyle(c);
+      if (!isVisible(c)) continue;
+      if (!badgeish(c, st)) continue;
+      return v; // badge แดง ที่ใกล้ป้าย "แชท" มากสุด = ตัวที่ต้องการ
+    }
+  }
+  return 0; // มีเมนู แต่ badge ว่าง = ไม่มีแชทค้าง
+}
+
 function collectNumericCandidates() {
   const values = [];
   const seen = new Set();
@@ -167,7 +197,7 @@ function sendUpdate() {
     tier: account.tier,
     unread: currentTotal,
     badges: lastValues,
-    source: 'bridge',
+    source: sourceMode,
   };
 
   fetch(`${BRIDGE_URL}/api/update-count`, {
@@ -189,8 +219,15 @@ function sendUpdate() {
 }
 
 function scanNow(force) {
+  const menuV = menuChatUnread();
   const values = collectNumericCandidates();
-  currentTotal = values.reduce((s, v) => s + v, 0);
+  if (menuV === null) {
+    currentTotal = values.reduce((s, v) => s + v, 0);
+    sourceMode = 'bridge';
+  } else {
+    currentTotal = menuV; // ใช้ตัวเลขจากเมนู "แชท" เป็นหลัก
+    sourceMode = 'menu';
+  }
   lastValues = values;
 
   // ส่งเฉพาะเมื่อค่าคงที่ 2 จังหวะติดกัน (กันตัวเลขกระพริบตอน DOM กำลังเปลี่ยน)
