@@ -144,8 +144,25 @@ function parseValue(txt) {
   return m ? parseInt(m[1], 10) : null;
 }
 
-// ตัวเลขจากเมนู "แชท" (ป้ายซ้ายมือ) — ตัวเดียวที่อยากได้
-// ถ้าหาไม่เจอ (หน้าไม่ใช่หน้าหลัก) คืน null → ใช้วิธีรวมย่อยแทน
+// ตรวจว่า node นี้เป็น "ตัวเลข badge" (ตัวเองแดง หรือ row มันมี class badge/unread/notif)
+function isBadgeText(el) {
+  const v = parseValue(el.textContent);
+  if (v === null) return false;
+  const st = window.getComputedStyle(el);
+  if (!isVisible(el)) return false;
+  if (badgeish(el, st)) return true;
+  let p = el.parentElement;
+  for (let i = 0; i < 3 && p; i++) {
+    const cl = (p.className || '').toString().toLowerCase();
+    if (/badge|unread|count|notif|alert/.test(cl)) return true;
+    if (badgeish(p, window.getComputedStyle(p))) return true;
+    p = p.parentElement;
+  }
+  return false;
+}
+
+// ตัวเลขจากเมนู "แชท" (ป้ายซ้ายมือ) — ไล่หา badge ใกล้ป้ายโครงสร้าง
+// /nav/div[1]/a/div — badge อยู่ sibling ใกล้ๆ ในแถวเดียวกัน
 function menuChatUnread() {
   const leafs = document.querySelectorAll('*');
   let label = null;
@@ -155,22 +172,39 @@ function menuChatUnread() {
     if (t === 'แชท' || t === 'Chat') { label = el; break; }
   }
   if (!label) return null;
+
   let row = label;
-  for (let i = 0; i < 6 && row; i++) {
-    row = row.parentElement;
-    if (!row) continue;
-    const cands = row.querySelectorAll('*');
-    for (const c of cands) {
+  let parent = label.parentElement;
+  for (let i = 0; i < 6 && parent; i++) {
+    row = parent;
+    const kids = Array.from(parent.children);
+    const labelIdx = kids.indexOf(label);
+    const hits = [];
+    for (const c of row.querySelectorAll('*')) {
       if (c.children.length) continue;
       const v = parseValue(c.textContent);
       if (v === null) continue;
-      const st = window.getComputedStyle(c);
-      if (!isVisible(c)) continue;
-      if (!badgeish(c, st)) continue;
-      return v; // badge แดง ที่ใกล้ป้าย "แชท" มากสุด = ตัวที่ต้องการ
+      if (!isBadgeText(c)) continue;
+      hits.push(c);
     }
+    if (hits.length) {
+      if (labelIdx >= 0) {
+        // เลือกตัวที่ใกล้ป้ายที่สุดในตำแหน่ง DOM
+        const idxs = hits.map((c) => {
+          const ci = row.children.length
+            ? Array.from(row.children).findIndex((x) => x.contains(c) || x === c)
+            : -1;
+          return { c, d: ci < 0 ? 999 : Math.abs(ci - labelIdx), ci };
+        });
+        idxs.sort((a, b) => a.d - b.d);
+        return parseValue(idxs[0].c.textContent);
+      }
+      return parseValue(hits[0].textContent);
+    }
+    label = parent;
+    parent = parent.parentElement;
   }
-  return 0; // มีเมนู แต่ badge ว่าง = ไม่มีแชทค้าง
+  return 0; // หาเมนูเจอ แต่ badge ว่าง = ไม่มีแชทค้าง
 }
 
 function collectNumericCandidates() {
