@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Monitor 747 LINE OA Bridge",
+  "version": "1.1.0",
+  "description": "ส่งตัวเลขแชทค้างจาก chat.line.biz ไปยัง dashboard MONITOR 747 แบบเรียลไทม์",
+  "permissions": ["storage"],
+  "host_permissions": ["https://chat.line.biz/*", "http://localhost:3000/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://chat.line.biz/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

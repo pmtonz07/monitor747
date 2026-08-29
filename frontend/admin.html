@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MONITOR 747 · ผู้ดูแล</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #070b0a; --panel: #0c120f; --card: #0e1612; --line: #1b2b24; --line2: #284236;
+    --ink: #e7f0eb; --mut: #789085; --faint: #4c5e54;
+    --green: #06c755; --green-soft: #7fe3ae; --amber: #f2b33d; --red: #ff5c5c;
+    --diamond: #9fd9ff; --gold: #f2c94c; --silver: #c9d1d9; --bronze: #d08a5a; --platinum: #e8eef5;
+    --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+    --sans: 'Archivo', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; min-height: 100vh; }
+  a { color: var(--green-soft); }
+  :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
+
+  .top {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 16px 20px; border-bottom: 1px solid var(--line); margin-bottom: 22px;
+  }
+  .top h1 { font-family: var(--mono); font-size: 18px; letter-spacing: 0.14em; }
+  .top h1 em { font-style: normal; color: var(--green); }
+  .top .sub { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--faint); text-transform: uppercase; }
+  .top .right { display: flex; align-items: center; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--mut); }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px; }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 20px; }
+  .card h2 { font-size: 14px; letter-spacing: 0.04em; margin-bottom: 12px; color: var(--ink); }
+  .hint { font-family: var(--mono); font-size: 12px; color: var(--mut); line-height: 1.7; }
+  .hint code { color: var(--green-soft); background: rgba(6,199,85,0.08); padding: 1px 6px; border-radius: 4px; }
+
+  label { display: block; font-size: 12px; color: var(--mut); margin: 10px 0 4px; }
+  input, select {
+    width: 100%; padding: 9px 10px; background: var(--card); border: 1px solid var(--line2);
+    color: var(--ink); border-radius: 7px; font-family: var(--sans); font-size: 13.5px;
+  }
+  input:focus, select:focus { border-color: var(--green); outline: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .grid .full { grid-column: 1 / -1; }
+
+  .btn {
+    margin-top: 14px; padding: 10px 16px; border: 1px solid var(--green); background: var(--green);
+    color: #04140c; font-weight: 700; border-radius: 7px; cursor: pointer; font-size: 13.5px;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.ghost { background: transparent; color: var(--green-soft); border-color: rgba(6,199,85,0.4); }
+  .btn.danger { background: transparent; color: var(--red); border-color: rgba(255,92,92,0.4); margin-top: 0; padding: 6px 12px; font-size: 12.5px; }
+
+  .msg { font-family: var(--mono); font-size: 12.5px; margin-top: 10px; min-height: 16px; }
+  .msg.ok { color: var(--green-soft); }
+  .msg.err { color: var(--red); }
+
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; }
+  th { text-align: left; color: var(--faint); font-weight: 500; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--line2); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tier-chip { display: inline-block; border: 1px solid var(--line2); border-radius: 999px; padding: 2px 8px; font-size: 10.5px; letter-spacing: 0.08em; }
+  .mono-id { color: var(--mut); font-size: 11.5px; word-break: break-all; }
+
+  #login { max-width: 380px; margin: 8vh auto 0; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div>
+      <h1>MONITOR <em>747</em> · ผู้ดูแล</h1>
+      <div class="sub">manage line oa accounts</div>
+    </div>
+    <div class="right">
+      <span class="dot"></span><span id="conn">เชื่อมต่อ</span>
+      <a href="." id="backLink">← กลับ dashboard</a>
+    </div>
+  </div>
+
+  <div class="wrap" id="loginView" hidden>
+    <div class="card" id="login">
+      <h2>เข้าสู่ระบบผู้ดูแล</h2>
+      <label for="key">รหัสผู้ดูแล (Admin Key)</label>
+      <input id="key" type="password" placeholder="ADMIN_KEY" />
+      <button class="btn" id="btnLogin">เข้าสู่ระบบ</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+  </div>
+
+  <div class="wrap" id="mainView" hidden>
+    <div class="card">
+      <h2>เพิ่ม / แก้ไขบัญชี LINE</h2>
+      <p class="hint">accountId = ตัวเลข U... ใน URL ของหน้า: <code>chat.line.biz/Uxxxxxxxx/</code></p>
+      <div class="grid">
+        <div>
+          <label>Account ID (U...)</label>
+          <input id="fId" placeholder="Uxxxxxxxx" />
+        </div>
+        <div>
+          <label>ชื่อไลน์ (ชื่อย่อบน dashboard)</label>
+          <input id="fName" placeholder="เช่น Support Gold V.10" />
+        </div>
+        <div>
+          <label>บริษัท/กลุ่ม</label>
+          <input id="fCompany" placeholder="VPG" value="VPG" />
+        </div>
+        <div>
+          <label>Tier</label>
+          <select id="fTier">
+            <option>Platinum</option><option>Diamond</option><option>Gold</option>
+            <option>Silver</option><option>Bronze</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="btnAdd">เพิ่มบัญชี</button>
+      <div class="msg" id="formMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>รายการบัญชีปัจจุบัน</h2>
+      <table>
+        <thead>
+          <tr><th>ชื่อไลน์</th><th>Account ID</th><th>บริษัท</th><th>Tier</th><th style="text-align:right">แชทค้าง</th><th></th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>วิธีเชื่อมต่อจากเครื่องอื่น</h2>
+      <p class="hint">
+        1. ติดตั้ง extension (โฟลเดอร์ <code>monitor747-extension</code>) บน Chrome ของอีกเครื่อง<br>
+        2. กดปุ่ม extension → ใส่ <code id="bridgeUrl">...</code> → บันทึก<br>
+        3. เปิดหน้า <code>chat.line.biz/U.../</code> ของบัญชีในลิสต์ → ข้อมูลเข้า dashboard อัตโนมัติ
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    // backend URL: ตั้งได้ผ่าน ?backend=https://xxx หรือใช้ origin เดียวกับหน้า
+    const BACKEND = (new URLSearchParams(location.search).get('backend') || location.origin).replace(/\/$/, '');
+    const $ = (s, r = document) => r.querySelector(s);
+    const TIER_COLORS = { Platinum: 'var(--platinum)', Diamond: 'var(--diamond)', Gold: 'var(--gold)', Silver: 'var(--silver)', Bronze: 'var(--bronze)' };
+    let key = sessionStorage.getItem('m747key') || '';
+
+    const conn = $('#conn');
+    const socket = io(BACKEND);
+    socket.on('connect', () => { conn.textContent = 'เชื่อมต่อ'; });
+    socket.on('disconnect', () => { conn.textContent = 'หลุด'; });
+    socket.on('update', () => { if (key) load(); });
+
+    async function api(path, opts = {}) {
+      opts.headers = opts.headers || {};
+      opts.headers['Content-Type'] = 'application/json';
+      if (key) opts.headers['x-admin-key'] = key;
+      const r = await fetch(BACKEND + path, opts);
+      const j = await r.json().catch(() => ({}));
+      return { ok: r.ok, j };
+    }
+
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    $('#bridgeUrl').textContent = BACKEND;
+    $('#backLink').href = `${location.origin}/?backend=${encodeURIComponent(BACKEND)}`;
+
+    $('#btnLogin').addEventListener('click', async () => {
+      const k = $('#key').value.trim();
+      const { ok, j } = await api('/api/admin/auth', { method: 'POST', body: JSON.stringify({ key: k }) });
+      if (ok && j.ok) {
+        key = k;
+        sessionStorage.setItem('m747key', k);
+        showMain();
+      } else {
+        const m = $('#loginMsg');
+        m.textContent = 'รหัสไม่ถูกต้อง';
+        m.className = 'msg err';
+      }
+    });
+
+    $('#btnAdd').addEventListener('click', async () => {
+      const body = JSON.stringify({
+        accountId: $('#fId').value.trim(),
+        name: $('#fName').value.trim(),
+        company: $('#fCompany').value.trim(),
+        tier: $('#fTier').value,
+      });
+      const { ok, j } = await api('/api/admin/add', { method: 'POST', body });
+      const m = $('#formMsg');
+      m.textContent = j.error || (ok ? 'เพิ่มแล้ว' : 'ผิดพลาด');
+      m.className = ok ? 'msg ok' : 'msg err';
+      if (ok) {
+        $('#fId').value = ''; $('#fName').value = '';
+        load();
+      }
+    });
+
+    $('#rows').addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-del]');
+      if (!btn) return;
+      if (!confirm('ลบบัญชี "' + btn.dataset.del + '"?')) return;
+      const { ok, j } = await api('/api/admin/remove/' + encodeURIComponent(btn.dataset.del), { method: 'DELETE' });
+      if (ok) load();
+      else alert(j.error || 'ลบไม่สำเร็จ');
+    });
+
+    async function load() {
+      const { ok, j } = await api('/api/admin/list');
+      if (!ok) return handleUnauthorized();
+      const rows = (j.accounts || [])
+        .slice()
+        .sort((a, b) => ['Platinum','Diamond','Gold','Silver','Bronze'].indexOf(a.tier) - ['Platinum','Diamond','Gold','Silver','Bronze'].indexOf(b.tier) || b.unread - a.unread);
+      $('#rows').innerHTML = rows.map((a) => `
+        <tr>
+          <td><strong style="font-family:var(--sans)">${esc(a.name)}</strong></td>
+          <td class="mono-id">${esc(a.accountId)}</td>
+          <td>${esc(a.company)}</td>
+          <td><span class="tier-chip" style="color:${TIER_COLORS[a.tier] || '#fff'}">${esc(a.tier)}</span></td>
+          <td class="num">${a.unread}</td>
+          <td><button class="btn danger" data-del="${esc(a.name)}">ลบ</button></td>
+        </tr>`).join('') || '<tr><td colspan="6" style="color:var(--faint)">ยังไม่มีบัญชี</td></tr>';
+    }
+
+    function handleUnauthorized() {
+      key = '';
+      sessionStorage.removeItem('m747key');
+      $('#loginView').hidden = false;
+      $('#mainView').hidden = true;
+    }
+
+    function showMain() {
+      $('#loginView').hidden = true;
+      $('#mainView').hidden = false;
+      load();
+    }
+
+    if (key) {
+      showMain();
+    } else {
+      $('#loginView').hidden = false;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: monitor747
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: ADMIN_KEY
+        value: 747admin
+        sync: false

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MONITOR 747 · สรุปแชทค้าง LINE OA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #070b0a;
+    --panel: #0c120f;
+    --card: #0e1612;
+    --line: #1b2b24;
+    --line2: #284236;
+    --ink: #e7f0eb;
+    --mut: #789085;
+    --faint: #4c5e54;
+    --green: #06c755;
+    --green-soft: #7fe3ae;
+    --green-deep: #0a3a25;
+    --amber: #f2b33d;
+    --red: #ff5c5c;
+    --diamond: #9fd9ff;
+    --gold: #f2c94c;
+    --silver: #c9d1d9;
+    --bronze: #d08a5a;
+    --platinum: #e8eef5;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+    --sans: 'Archivo', system-ui, -apple-system, sans-serif;
+    --r: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { color-scheme: dark; }
+
+  body {
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(6,199,85,0.06), transparent 60%),
+      radial-gradient(900px 500px at 110% 0%, rgba(159,217,255,0.04), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection { background: rgba(6,199,85,0.28); }
+
+  /* ---------- top signal rail ---------- */
+  .rail-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(7,11,10,0.85);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .rail-top .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rail-top .etch { color: var(--faint); }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    flex: none;
+  }
+  .status.is-live .dot { animation: pulse 2.2s ease-in-out infinite; }
+  .status.is-off .dot { background: var(--red); animation: none; }
+  .status.is-on .dot { background: var(--faint); animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(6,199,85,0.55); }
+    50% { box-shadow: 0 0 0 6px rgba(6,199,85,0); }
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 26px 28px 18px;
+  }
+
+  .brand { display: flex; align-items: baseline; gap: 14px; }
+
+  .brand h1 {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 0.16em;
+    color: var(--ink);
+  }
+  .brand h1 em {
+    font-style: normal;
+    color: var(--green);
+  }
+
+  .brand-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .mast-actions { display: flex; align-items: center; gap: 18px; }
+
+  .link-admin { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--mut); text-decoration: none; border: 1px solid var(--line2); border-radius: 7px; padding: 7px 12px; transition: border-color 0.15s ease, color 0.15s ease; }
+  .link-admin:hover { color: var(--green-soft); border-color: rgba(6,199,85,0.45); }
+
+  .conn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mut);
+  }
+  .conn .dot { width: 8px; height: 8px; }
+  .conn.is-live { color: var(--green-soft); }
+
+  .btn {
+    appearance: none;
+    background: rgba(6,199,85,0.08);
+    color: var(--green-soft);
+    border: 1px solid rgba(6,199,85,0.35);
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:hover { background: rgba(6,199,85,0.16); border-color: rgba(6,199,85,0.6); }
+  .btn[data-on='true'] { background: var(--green); border-color: var(--green); color: #04140c; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    display: flex;
+    gap: 28px;
+    align-items: stretch;
+    padding: 14px 28px 26px;
+    flex-wrap: wrap;
+  }
+
+  .hero-cell {
+    background: linear-gradient(180deg, var(--panel), rgba(12,18,15,0.6));
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 20px 24px 22px;
+  }
+
+  .hero-total { flex: 1 1 360px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; position: relative; overflow: hidden; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mut);
+  }
+  .eyebrow::before {
+    content: '▍';
+    color: var(--green);
+    margin-right: 6px;
+  }
+
+  .total { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+  .total-num {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(64px, 9vw, 118px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 0 rgba(6,199,85,0);
+    transition: text-shadow 0.3s ease;
+  }
+  .hero-total.ticking .total-num { text-shadow: 0 0 34px rgba(6,199,85,0.45); }
+
+  .total-notes { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+
+  .hero-total .cell-label { align-self: flex-start; }
+
+  .hero-tiers { flex: 1 1 260px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+
+  .tier-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s ease;
+  }
+  .tier-row:last-child { border-bottom: none; }
+  .tier-row:hover { background: rgba(255,255,255,0.02); }
+  .tier-row.hot { border-color: rgba(242,179,61,0.4); background: rgba(242,179,61,0.06); }
+
+  .tier-row .tier-ico { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .tier-row .tier-name { flex: 1; min-width: 0; font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tier-row .tier-right { flex: none; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; gap: 2px; text-align: right; }
+  .tier-row .tier-amt { font-family: var(--mono); font-weight: 600; font-size: 21px; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .tier-row .tier-note { font-family: var(--mono); font-size: 10px; color: var(--faint); white-space: nowrap; }
+
+  /* ---------- board ---------- */
+  .board {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+    padding: 6px 28px 40px;
+  }
+
+  .company-head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .company-head .co-name { font-weight: 700; font-size: 20px; letter-spacing: 0.01em; }
+  .company-head .co-code { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--faint); }
+  .company-head .co-meta { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--mut); font-variant-numeric: tabular-nums; }
+
+  .company-head .co-code::before { content: '◈ '; color: var(--green); }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  /* ---------- card ---------- */
+  .card {
+    background: linear-gradient(180deg, var(--card), rgba(14,22,18,0.72));
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 12px 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    height: 100%;
+    background: var(--line2);
+  }
+
+  .card[data-tier='Diamond']::before { background: linear-gradient(180deg, var(--diamond), rgba(159,217,255,0.15)); }
+  .card[data-tier='Gold']::before    { background: linear-gradient(180deg, var(--gold), rgba(242,201,76,0.15)); }
+  .card[data-tier='Silver']::before  { background: linear-gradient(180deg, var(--silver), rgba(201,209,217,0.15)); }
+  .card[data-tier='Bronze']::before  { background: linear-gradient(180deg, var(--bronze), rgba(208,138,90,0.15)); }
+  .card[data-tier='Platinum']::before{ background: linear-gradient(180deg, var(--platinum), rgba(232,238,245,0.15)); }
+
+  .card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-left: 10px;
+  }
+
+  .card-info { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 2px; min-width: 0; }
+
+  .acct-name {
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    word-break: break-word;
+  }
+
+  .tier-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    width: fit-content;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mut);
+    border: 1px solid var(--line2);
+    border-radius: 999px;
+    padding: 3px 8px;
+  }
+  .tier-pill i { width: 7px; height: 7px; border-radius: 50%; }
+  .tier-pill[data-tier='Diamond'] i { background: var(--diamond); }
+  .tier-pill[data-tier='Gold'] i    { background: var(--gold); }
+  .tier-pill[data-tier='Silver'] i  { background: var(--silver); }
+  .tier-pill[data-tier='Bronze'] i  { background: var(--bronze); }
+  .tier-pill[data-tier='Platinum'] i{ background: var(--platinum); }
+
+  .count-right { display: flex; align-items: baseline; gap: 7px; flex: none; }
+
+  .count {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    display: inline-block;
+    will-change: transform;
+  }
+  .count.num-up   { color: var(--amber); }
+  .count.num-down { color: var(--green-soft); }
+  .count.num-alert{ color: var(--red); }
+
+  .count-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); }
+
+  /* ---------- queue rail ---------- */
+  .rail {
+    position: relative;
+    display: flex;
+    gap: 3px;
+    height: 26px;
+    align-items: stretch;
+    padding: 12px 0 0;
+  }
+
+  .rail-slot {
+    flex: 1 1 0;
+    min-width: 3px;
+    background: #14211b;
+    border-radius: 2px;
+    height: 6px;
+    align-self: center;
+    transition: background 0.25s ease;
+  }
+  .rail-slot.on-green { background: var(--green); }
+  .rail-slot.on-amber { background: var(--amber); }
+  .rail-slot.on-red   { background: var(--red); }
+
+  .rail-mark {
+    position: absolute;
+    top: 4px;
+    bottom: 0;
+    width: 2px;
+    background: rgba(242,179,61,0.55);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .rail-mark b {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    background: var(--card);
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+
+  .over {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .over::before {
+    content: '▲';
+    font-size: 9px;
+  }
+
+  .card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 2px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+  }
+
+  .src { display: inline-flex; align-items: center; gap: 6px; }
+  .src::before { content: '⇄'; color: var(--faint); }
+
+  .sl-chip { color: var(--mut); }
+  .upd { font-variant-numeric: tabular-nums; }
+
+  /* ---------- states / motion ---------- */
+  .empty {
+    border: 1px dashed var(--line2);
+    border-radius: var(--r);
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--mut);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .empty strong { color: var(--ink); font-weight: 600; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    @keyframes tock {
+      0%   { transform: translateY(-14%); opacity: 0.25; }
+      40%  { transform: translateY(4%); opacity: 1; }
+      100% { transform: none; }
+    }
+
+    .count.tock { animation: tock 0.42s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .count.num-up, .count.num-down, .count.num-alert { transition: color 0.4s ease; }
+  }
+
+  /* ---------- footer ---------- */
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 18px 28px 30px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--faint);
+  }
+
+  .legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; }
+  .legend i { width: 7px; height: 7px; border-radius: 50%; }
+
+  @media (max-width: 720px) {
+    .masthead { padding: 20px 16px 14px; }
+    .brand { flex-wrap: wrap; row-gap: 6px; }
+    .brand-sub { width: 100%; }
+    .hero { padding: 10px 16px 22px; }
+    .board { padding: 4px 16px 30px; }
+    .foot { padding: 16px; }
+    .rail-top { padding: 8px 16px; }
+    .total { gap: 10px; }
+    .company-head .co-meta { width: 100%; margin-left: 0; }
+    .card-row { flex-wrap: wrap; gap: 10px; }
+    .count { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="rail-top">
+    <div class="status" id="signal">
+      <span class="dot"></span>
+      <span id="signalText">ช่องทาง · คิวแชทค้าง</span>
+    </div>
+    <div class="etch">
+      บริดจ์ <span id="clock">--:--:--</span>
+    </div>
+  </div>
+
+  <header class="masthead">
+    <div class="brand">
+      <h1>MONITOR <em>747</em></h1>
+      <span class="brand-sub">สรุปแชทค้าง LINE OA</span>
+    </div>
+    <div class="mast-actions">
+      <a class="link-admin" href="/admin">ผู้ดูแล · เพิ่ม/ลบบัญชี</a>
+      <button id="simBtn" class="btn" aria-pressed="false">เปิดสตรีมจำลอง</button>
+      <div class="conn" id="conn">
+        <span class="dot"></span>
+        <span id="connText">เชื่อมต่อไม่ได้</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-cell hero-total" id="heroTotal">
+      <p class="eyebrow">แชทค้าง · รวมทุกบัญชี</p>
+      <div class="total">
+        <div class="total-num" id="totalNum">0</div>
+        <p class="total-notes" id="totalNotes">แชทค้างรอตอบ</p>
+      </div>
+    </div>
+    <div class="hero-cell hero-tiers" id="tierSummary"></div>
+  </section>
+
+  <main class="board" id="board"></main>
+
+  <footer class="foot">
+    <p>ช่องทางข้อมูล · ขยายจาก chat.line.biz</p>
+    <div class="legend">
+      <span><i style="background:var(--platinum)"></i>Platinum</span>
+      <span><i style="background:var(--diamond)"></i>Diamond</span>
+      <span><i style="background:var(--gold)"></i>Gold</span>
+      <span><i style="background:var(--silver)"></i>Silver</span>
+      <span><i style="background:var(--bronze)"></i>Bronze</span>
+    </div>
+    <p id="clock2">--:--:--</p>
+  </footer>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    // backend URL: ตั้งได้ผ่าน ?backend=https://xxx หรือใช้ origin เดียวกับหน้า
+    const BACKEND = (new URLSearchParams(location.search).get('backend') || location.origin).replace(/\/$/, '');
+    const socket = io(BACKEND);
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+    const state = {
+      accounts: [],
+      byName: new Map(),
+      total: 0,
+      lastCompaniesKey: '',
+    };
+
+    const TIER_ORDER = { Diamond: 0, Platinum: 1, Gold: 2, Silver: 3, Bronze: 4 };
+    const TIER_COLORS = { Platinum: 'var(--platinum)', Diamond: 'var(--diamond)', Gold: 'var(--gold)', Silver: 'var(--silver)', Bronze: 'var(--bronze)' };
+    const TIER_LABELS = { Platinum: 'Platinum', Diamond: 'Diamond', Gold: 'Gold', Silver: 'Silver', Bronze: 'Bronze' };
+const SRC_LABELS = { bridge: 'บริดจ์', sim: 'สตรีมจำลอง', seed: 'ข้อมูลตัวอย่าง' };
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const fmtTime = (ts) => {
+      const d = new Date(ts);
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    };
+    const fmtNum = (n) => Number(n).toLocaleString('en-US');
+    const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    /* clock */
+    const clockEls = [$('#clock'), $('#clock2')];
+    setInterval(() => {
+      const now = fmtTime(Date.now());
+      clockEls.forEach((el) => { if (el) el.textContent = now; });
+    }, 1000);
+
+    /* connection */
+    const conn = $('#conn');
+    const connText = $('#connText');
+    const signal = $('#signal');
+    const signalText = $('#signalText');
+    socket.on('connect', () => {
+      conn.classList.add('is-live');
+      connText.textContent = 'เชื่อมต่อแล้ว';
+      signal.classList.add('is-live');
+      signal.classList.remove('is-on', 'is-off');
+      signalText.textContent = 'ช่องทาง · รับข้อมูลอยู่';
+    });
+    socket.on('disconnect', () => {
+      conn.classList.remove('is-live');
+      conn.classList.add('is-off');
+      connText.textContent = 'หลุดการเชื่อมต่อ';
+      signal.classList.replace('is-live', 'is-off');
+      signalText.textContent = 'ช่องทาง · ขาดการเชื่อมต่อ';
+    });
+    socket.on('connect_error', () => {
+      conn.classList.remove('is-live');
+      conn.classList.add('is-off');
+      connText.textContent = 'backend ยังไม่รัน?';
+    });
+
+    /* grouping */
+    function group(accounts) {
+      const map = new Map();
+      const order = [];
+      for (const a of accounts) {
+        if (!map.has(a.company)) {
+          map.set(a.company, new Map());
+          order.push(a.company);
+        }
+        const tiers = map.get(a.company);
+        if (!tiers.has(a.tier)) tiers.set(a.tier, []);
+        tiers.get(a.tier).push(a);
+      }
+      return { map, order };
+    }
+
+    function tierSort(tiers) {
+      return tiers.slice().sort((a, b) => (TIER_ORDER[a] ?? 9) - (TIER_ORDER[b] ?? 9));
+    }
+
+    /* hero: total */
+    function updateTotal(total) {
+      const el = $('#totalNum');
+      const prev = parseInt(el.textContent.replace(/,/g, ''), 10) || 0;
+      if (prev === total) return;
+      const hero = $('#heroTotal');
+      el.textContent = fmtNum(total);
+      hero.classList.remove('ticking');
+      void hero.offsetWidth;
+      hero.classList.add('ticking');
+    }
+
+    function updateNotes(accounts) {
+      const companies = new Set();
+      accounts.forEach((a) => companies.add(a.company));
+      $('#totalNotes').textContent =
+        `แชทค้างรอตอบ · ${accounts.length} บัญชี · ${companies.size} บริษัท`;
+    }
+
+    /* hero: tier summary */
+    function renderTiers(accounts) {
+      const sums = {};
+      for (const t of Object.keys(TIER_ORDER)) sums[t] = { n: 0, unread: 0 };
+      accounts.forEach((a) => {
+        if (sums[a.tier]) {
+          sums[a.tier].n += 1;
+          sums[a.tier].unread += a.unread;
+        }
+      });
+      const box = $('#tierSummary');
+      box.innerHTML = tierSort(Object.keys(sums))
+        .map((t) => {
+          const s = sums[t];
+          const hot = s.n > 0 && s.unread >= 24;
+          const note = s.n > 0 ? `${s.n} บัญชี` : '—';
+          return `<div class="tier-row${hot ? ' hot' : ''}">
+            <span class="tier-ico" style="background:${TIER_COLORS[t]}"></span>
+            <span class="tier-name">${TIER_LABELS[t]}</span>
+            <div class="tier-right">
+              <span class="tier-amt" style="color:${s.n ? TIER_COLORS[t] : 'var(--faint)'}">${s.n ? fmtNum(s.unread) : '0'}</span>
+              <span class="tier-note">${note}</span>
+            </div>
+          </div>`;
+        })
+        .join('');
+    }
+
+    /* rail */
+    function slotsFor(limit) {
+      return Math.min(24, Math.max(8, limit));
+    }
+
+    function buildRail(limit) {
+      const slots = slotsFor(limit);
+      const lit = Array.from({ length: slots }, () => `<span class="rail-slot"></span>`).join('');
+      const markLeft = Math.min(100, (limit / slots) * 100) + '%';
+      return `<div class="rail" data-slots="${slots}">
+        <span class="rail-mark" style="left:${markLeft}"><b>เป้า ${limit}</b></span>
+        ${lit}
+      </div>`;
+    }
+
+    function paintRail(rail, unread, limit) {
+      const slots = parseInt(rail.dataset.slots, 10);
+      const filled = Math.min(slots, unread);
+      const amberStart = Math.floor(limit * 0.66);
+      const slotEls = $$('.rail-slot', rail);
+      slotEls.forEach((s, i) => {
+        s.className = 'rail-slot';
+        if (i >= filled) return;
+        if (i >= limit - 1) s.classList.add('on-red');
+        else if (i >= amberStart) s.classList.add('on-amber');
+        else s.classList.add('on-green');
+      });
+    }
+
+    /* card */
+    function buildCard(acc) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.dataset.account = acc.name;
+      card.dataset.tier = acc.tier;
+      card.dataset.prev = String(acc.unread);
+card.innerHTML = `
+        <div class="card-row">
+          <div class="card-info">
+            <h3 class="acct-name">${esc(acc.name)}</h3>
+            <span class="tier-pill" data-tier="${esc(acc.tier)}"><i></i>${esc(TIER_LABELS[acc.tier] || acc.tier)}</span>
+          </div>
+          <div class="count-right">
+            <span class="count">${fmtNum(acc.unread)}</span>
+            <span class="count-label">แชทค้าง</span>
+          </div>
+        </div>
+        ${buildRail(acc.limit)}
+        <div class="over" hidden></div>
+        <footer class="card-foot">
+          <span class="src">แหล่ง: ${esc(SRC_LABELS[acc.source] || acc.source || 'seed')}</span>
+          <span class="sl-chip">เป้า ${acc.limit}</span>
+          <time class="upd">${fmtTime(acc.updatedAt)}</time>
+        </footer>`;
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        card.style.animation = 'cardIn 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both';
+      }
+      return card;
+    }
+
+    function updateCard(card, acc) {
+      const countEl = $('.count', card);
+      const prev = parseInt(card.dataset.prev, 10);
+      card.dataset.prev = String(acc.unread);
+
+      const countNow = parseInt(countEl.textContent.replace(/,/g, ''), 10) || 0;
+      if (countNow !== acc.unread) {
+        countEl.textContent = fmtNum(acc.unread);
+        countEl.classList.remove('tock');
+        void countEl.offsetWidth;
+        countEl.classList.add('tock');
+      }
+
+      const rail = $('.rail', card);
+      paintRail(rail, acc.unread, acc.limit);
+
+      const overEl = $('.over', card);
+      const over = Math.max(0, acc.unread - acc.limit);
+      if (over > 0) {
+        overEl.hidden = false;
+        overEl.textContent = `${fmtNum(over)} เกินเป้า`;
+      } else {
+        overEl.hidden = true;
+      }
+
+      $('.upd', card).textContent = fmtTime(acc.updatedAt);
+      const srcEl = $('.src', card);
+      srcEl.textContent = `แหล่ง: ${SRC_LABELS[acc.source] || acc.source || 'seed'}`;
+
+      if (Number.isFinite(prev) && prev !== acc.unread) {
+        let cls = 'num-up';
+        if (acc.unread === 0) cls = 'num-down';
+        else if (acc.unread >= acc.limit) cls = 'num-alert';
+        else if (acc.unread < prev) cls = 'num-down';
+        countEl.classList.remove('num-up', 'num-down', 'num-alert');
+        void countEl.offsetWidth;
+        countEl.classList.add(cls);
+        setTimeout(() => {
+          countEl.classList.remove('num-up', 'num-down', 'num-alert');
+        }, 900);
+      }
+    }
+
+    /* board assembly */
+    function ensureSections(byCompany) {
+      const board = $('#board');
+      const key = byCompany.order.join('|');
+      if (key === state.lastCompaniesKey) return;
+      board.innerHTML = '';
+
+      for (const company of byCompany.order) {
+        const tiers = byCompany.map.get(company);
+        const all = [];
+        for (const [, list] of tiers) all.push(...list);
+        const section = document.createElement('section');
+        section.className = 'company';
+        section.dataset.company = company;
+
+        const code = company.replace(/[^a-z0-9]/gi, '').slice(0, 5).toUpperCase() || 'CO';
+        const accCount = all.length;
+        const unreadTotal = all.reduce((s, a) => s + a.unread, 0);
+
+        const head = document.createElement('header');
+        head.className = 'company-head';
+        head.innerHTML = `
+          <span class="co-code">${esc(code)}</span>
+          <span class="co-name">${esc(company)}</span>
+          <span class="co-meta">${accCount} บัญชี · ${fmtNum(unreadTotal)} แชทค้าง</span>`;
+        section.appendChild(head);
+
+        const grid = document.createElement('div');
+        grid.className = 'cards';
+        section.appendChild(grid);
+        board.appendChild(section);
+      }
+      state.lastCompaniesKey = key;
+    }
+
+    function renderBoard(accounts) {
+      const byCompany = group(accounts);
+      ensureSections(byCompany);
+      if (!accounts.length) {
+        $('#board').innerHTML = `
+          <div class="empty">
+            <strong>ยังไม่มีบัญชีที่เชื่อมต่อ</strong><br>
+            ติดตั้ง Chrome extension แล้วเปิดหน้า chat.line.biz<br>
+            หรือกด "เปิดสตรีมจำลอง" เพื่อดูตัวอย่างข้อมูล
+          </div>`;
+        return;
+      }
+
+      for (const company of byCompany.order) {
+        const tiers = byCompany.map.get(company);
+        const grid = $(`.company[data-company="${CSS.escape(company)}"] .cards`, document);
+
+        const present = new Set();
+        const namesInTierOrder = [];
+        for (const tier of tierSort(Array.from(tiers.keys()))) {
+          const list = tiers.get(tier);
+          for (const a of list) {
+            present.add(a.name);
+            namesInTierOrder.push(a);
+          }
+        }
+
+        const desired = namesInTierOrder.map((a) => a.name);
+        const current = $$('.card', grid).map((c) => c.dataset.account);
+        const orderChanged = desired.join('|') !== current.join('|');
+
+        if (orderChanged) {
+          const old = new Map($$('.card', grid).map((c) => [c.dataset.account, c]));
+          grid.innerHTML = '';
+          for (const acc of namesInTierOrder) {
+            const exist = old.get(acc.name);
+            grid.appendChild(exist || buildCard(acc));
+          }
+        }
+
+        let cards = new Map($$('.card', grid).map((c) => [c.dataset.account, c]));
+        for (const acc of namesInTierOrder) {
+          let card = cards.get(acc.name);
+          if (!card) {
+            card = buildCard(acc);
+            grid.appendChild(card);
+            cards.set(acc.name, card);
+          } else {
+            card.dataset.tier = acc.tier;
+            const pill = $('.tier-pill', card);
+            pill.innerHTML = `<i></i>${esc(TIER_LABELS[acc.tier] || acc.tier)}`;
+          }
+          updateCard(card, acc);
+        }
+
+        // remove vanished accounts
+        $$('.card', grid).forEach((c) => {
+          if (!present.has(c.dataset.account)) c.remove();
+        });
+      }
+
+      // refresh head meta
+      $$('.company').forEach((section) => {
+        const company = section.dataset.company;
+        const cards = $$('.card', section);
+        const total = cards.reduce((s, c) => {
+          const n = parseInt(c.dataset.prev, 10);
+          return s + (Number.isFinite(n) ? n : 0);
+        }, 0);
+        $('.co-meta', section).textContent = `${cards.length} บัญชี · ${fmtNum(total)} แชทค้าง`;
+      });
+    }
+
+    /* socket events */
+    function onData(data) {
+      state.accounts = data.accounts || [];
+      state.byName = new Map(state.accounts.map((a) => [a.name, a]));
+      const total = state.accounts.reduce((s, a) => s + (Number(a.unread) || 0), 0);
+      updateTotal(total);
+      updateNotes(state.accounts);
+      renderTiers(state.accounts);
+      renderBoard(state.accounts);
+    }
+
+    socket.on('init', onData);
+    socket.on('update', onData);
+    socket.on('connect', () => socket.emit('sync'));
+
+    /* sim toggle */
+    const simBtn = $('#simBtn');
+    simBtn.addEventListener('click', () => {
+      fetch(BACKEND + '/api/sim/toggle', { method: 'POST' })
+        .then((r) => r.json())
+        .then((d) => {
+          simBtn.dataset.on = String(d.running);
+          simBtn.setAttribute('aria-pressed', String(d.running));
+          simBtn.textContent = d.running ? 'ปิดสตรีมจำลอง' : 'เปิดสตรีมจำลอง';
+        })
+        .catch(() => {});
+    });
+  </script>
+</body>
+</html>
