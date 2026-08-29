@@ -44,14 +44,16 @@ function fetchConfig() {
         console.log('[MONITOR747] config loaded:', Object.keys(ACCOUNTS).length, 'accounts');
         scanNow();
       }
+      setTimeout(fetchConfig, 60000); // refresh config ปกติ 60 วิ
     })
     .catch((err) => {
-      console.warn('[MONITOR747] cannot reach backend', BRIDGE_URL, err.message, '- ใช้ config เก่า');
+      console.warn('[MONITOR747] cannot reach backend', BRIDGE_URL, err.message, '- retry 10s');
+      setTimeout(fetchConfig, 10000); // backend หลับ/ค้าง → ลองใหม่ไวๆ
     });
 }
 
 // refresh config ทุก 60 วิ (admin เพิ่ม/ลบไลน์ได้โดยไม่ต้อง reload extension)
-setInterval(fetchConfig, 60000);
+fetchConfig();
 
 function accountIdFromUrl() {
   const m = location.pathname.match(/^\/([A-Za-z0-9]+)\//);
@@ -149,6 +151,7 @@ function sendUpdate() {
       '[MONITOR747] skip (no config for accountId ' + (id || '(none)') + ')',
       '- add it via dashboard /admin'
     );
+    fetchConfig(); // ดึง config ใหม่ทันที เผื่อเพิ่งเพิ่มทาง admin
     return;
   }
   const payload = {

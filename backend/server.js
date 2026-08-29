@@ -26,7 +26,7 @@ const seed = [
   { name: 'Support Gold V.10', accountId: 'U343bc9bfa2213789633895c99c1281ab', company: 'VPG', tier: 'Gold' },
   { name: 'NewGd v1', accountId: 'U254b6bb2f9a1f048fb7185a2367eec1f', company: 'VPG', tier: 'Gold' },
   { name: 'SILVER V.6', accountId: 'Uc9575d79b0768a815b5ecb56c654925d', company: 'VPG', tier: 'Silver' },
-  { name: 'NewSv v1', accountId: 'U83ab5592e06648d14704a85d4b4c1db7', company: 'VPG', tier: 'Silver' },
+  { name: 'NewSv v1', accountId: 'U83ab5592e06648d14704a85d4b4c1db5', company: 'VPG', tier: 'Silver' },
   { name: 'Bronze', accountId: 'Uc59f042fb386b87d322cfc08779fb35b', company: 'VPG', tier: 'Bronze' },
   { name: 'NewBz v1', accountId: 'Udb53140fc95862176b4b998cb14afcc9', company: 'VPG', tier: 'Bronze' },
 ];
